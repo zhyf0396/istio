@@ -1,0 +1,21 @@
+Istio的关键组件：
+1、Pilot
+Pilot用于管理Istio的流量（具体执行是由Sidecar完成的）
+
+在整个系统中，Pilot完成以下功能：
+①从Kubernetes或其它平台的注册中心获取服务信息，完成服务发现过程
+②读取Istio的各项控制配置，在进行转换之后，将其发给数据面进行实施
+
+2、Mixer
+Mixer的职责主要有2个：预检和汇报；Mixer的简单工作流程如下：
+①用户将Mixer配置发送到Kubernetes中
+②Mixer通过对Kubernetes资源的监听，获知配置的变化
+③网格中的服务在每次调用之前，都向Mixer发出预检请求，查看调用是否允许执行；在每次调用之后，都发出报告信息，向Mixer汇报在调用过程中产生的监控和跟踪数据
+
+3、Citadel
+早期称之为Istio-CA，用于证书管理
+
+4、Sidecar（Envoy）
+Sidecar就是Istio中的数据面，负责控制面对网格控制的实际执行；Istio利用istio-init初始化容器中的iptables指令，对所在pod的流量进行劫持，从而接管Pod中应用的通信过程，如此一来就获得了通信的控制权，控制面的控制目的最终得以实现。
+	Sidecar模式的实现基础：同一个Pod中的多个容器间共享网络栈；Sidecar在加入之后，原有的直接通信方式从"源容器->目标容器"变成了"源容器->Sidecar->Sidecar->目的容器"。
+而Sidecar是用来接受控制面组件操作的，这样一来，就让通信过程中的控制和观察称为可能。
